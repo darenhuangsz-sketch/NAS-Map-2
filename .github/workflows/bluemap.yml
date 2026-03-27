@@ -20,11 +20,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Download Bluemap (fixed version)
+      - name: Download Bluemap (stable v5.16)
         run: |
           mkdir bluemap
           cd bluemap
-          wget https://github.com/BlueMap-Minecraft/BlueMap/releases/download/v5.17/bluemap-standalone.jar -O bluemap.jar
+          wget https://github.com/BlueMap-Minecraft/BlueMap/releases/download/v5.16/bluemap-standalone.jar -O bluemap.jar
 
       - name: Prepare Bluemap config
         run: |
