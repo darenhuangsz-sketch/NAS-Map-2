@@ -1,0 +1,54 @@
+name: Render Bluemap
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "world/**"
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download Bluemap
+        run: |
+          mkdir bluemap
+          cd bluemap
+          wget https://github.com/BlueMap-Minecraft/BlueMap/releases/latest/download/bluemap-standalone.jar -O bluemap.jar
+
+      - name: Prepare Bluemap config
+        run: |
+          mkdir bluemap/config
+          echo "webroot: ../web" > bluemap/config/main.conf
+          echo "maps:" >> bluemap/config/main.conf
+          echo "  - id: world" >> bluemap/config/main.conf
+          echo "    name: World" >> bluemap/config/main.conf
+          echo "    world: ../world" >> bluemap/config/main.conf
+          echo "    hires: true" >> bluemap/config/main.conf
+
+      - name: Run Bluemap Renderer
+        run: |
+          cd bluemap
+          java -jar bluemap.jar
+
+      - name: Upload rendered map as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bluemap-output
+          path: web
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: web
